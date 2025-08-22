@@ -129,7 +129,7 @@ function ProjectsPage() {
 
   // Handle project click
   const handleProjectClick = (projectId) => {
-    navigate(/project/${projectId})
+    navigate(`/project/${projectId}`)
   }
 
   // Handle logout
@@ -173,215 +173,8 @@ function ProjectsPage() {
 
   return (
     <>
-      {/* Custom CSS - Same as Dashboard */}
-      <style>
-        {`
-          .brand-highlight {
-            color: #00c2ff;
-          }
-          
-          .sidebar {
-            width: 250px;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-          }
-          
-          .sidebar.collapsed {
-            width: 70px;
-          }
-          
-          .sidebar-header {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          
-          .sidebar-nav {
-            padding: 1rem 0;
-          }
-          
-          .sidebar-nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-          }
-          
-          .sidebar-nav-item:hover,
-          .sidebar-nav-item.active {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left-color: #00c2ff;
-            text-decoration: none;
-          }
-          
-          .sidebar-nav-item i {
-            width: 20px;
-            margin-right: 10px;
-            text-align: center;
-          }
-          
-          .sidebar.collapsed .sidebar-nav-item span {
-            display: none;
-          }
-          
-          .main-content {
-            margin-left: 250px;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-            transition: all 0.3s ease;
-          }
-          
-          .main-content.expanded {
-            margin-left: 70px;
-          }
-          
-          .top-navbar {
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-          
-          .project-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border: none;
-            height: 100%;
-          }
-          
-          .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-          }
-          
-          .project-card-body {
-            padding: 1.5rem;
-          }
-          
-          .project-status {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-weight: 500;
-          }
-          
-          .btn-primary {
-            background-color: #00c2ff;
-            border-color: #00c2ff;
-            transition: all 0.3s ease;
-          }
-          
-          .btn-primary:hover {
-            background-color: #0099cc;
-            border-color: #0099cc;
-            transform: translateY(-2px);
-          }
-          
-          .filter-bar {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-            margin-bottom: 2rem;
-          }
-          
-          .profile-dropdown {
-            position: relative;
-          }
-          
-          .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            min-width: 200px;
-            z-index: 1001;
-          }
-          
-          .dropdown-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            color: #495057;
-            text-decoration: none;
-            transition: background-color 0.3s ease;
-          }
-          
-          .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #495057;
-            text-decoration: none;
-          }
-          
-          .dropdown-item i {
-            margin-right: 0.5rem;
-            width: 16px;
-          }
-          
-          .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 200px;
-          }
-          
-          .members-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem;
-            margin-top: 0.5rem;
-          }
-          
-          .member-badge {
-            background-color: #e9ecef;
-            color: #495057;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
-            border-radius: 8px;
-          }
-          
-          @media (max-width: 768px) {
-            .sidebar {
-              transform: translateX(-100%);
-            }
-            
-            .sidebar.show {
-              transform: translateX(0);
-            }
-            
-            .main-content {
-              margin-left: 0;
-            }
-            
-            .main-content.expanded {
-              margin-left: 0;
-            }
-            
-            .filter-bar {
-              flex-direction: column;
-              gap: 1rem;
-            }
-          }
-        `}
-      </style>
-
       {/* Sidebar */}
-      <div className={sidebar ${sidebarCollapsed ? 'collapsed' : ''}}>
+      <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
           <h4 className="text-white mb-0">
             <span className="brand-highlight">Code</span>Collab
@@ -432,7 +225,7 @@ function ProjectsPage() {
       </div>
 
       {/* Main Content */}
-      <div className={main-content ${sidebarCollapsed ? 'expanded' : ''}}>
+      <div className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}>
         {/* Top Navbar */}
         <div className="top-navbar">
           <div className="d-flex align-items-center">
@@ -569,7 +362,7 @@ function ProjectsPage() {
                     <div className="project-card-body">
                       <div className="d-flex justify-content-between align-items-start mb-3">
                         <h5 className="card-title fw-bold mb-0">{project.name}</h5>
-                        <span className={project-status ${getStatusBadgeClass(project.status)}}>
+                        <span className={`project-status ${getStatusBadgeClass(project.status)}`}>
                           {project.status}
                         </span>
                       </div>
@@ -687,4 +480,4 @@ function ProjectsPage() {
   )
 }
 
-export default ProjectsPage
+export default ProjectsPage
