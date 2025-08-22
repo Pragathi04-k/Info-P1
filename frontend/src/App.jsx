@@ -1,8 +1,8 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LandingPage from './Components/LandingPage';
-// import LoginPage from './Components/LoginPage';
-// import SignupPage from './Components/SignupPage';
+import LoginPage from './Components/Login';
+import SignupPage from './Components/SignUp';
 import DashboardPage from './Components/DashboardPage';
 import ProjectsPage from './Components/ProjectsPage'
 import AnalyticsPage from './Components/AnalyticsPage'
@@ -12,14 +12,15 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 // Import Bootstrap JS
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import Signup from './Components/SignUp';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        {/* <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} /> */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
@@ -30,4 +31,4 @@ function App() {
   )
 }
 
-export default App
+export default App

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
 import { handleError, handleSuccess } from '../utils';
-import bg from '../assets/bg.png'; // ✅ Import the background image
+ // ✅ Import the background image
 
 function Login() {
     const [loginInfo, setLoginInfo] = useState({
@@ -59,7 +59,7 @@ function Login() {
     return (
         <div
             className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
-            style={{ backgroundImage: `url(${bg})` }}
+            
         >
             {/* Dark overlay to make bg lighter */}
             <div className="absolute inset-0 bg-black/40"></div>

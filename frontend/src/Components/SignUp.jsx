@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify';
-import { handleError, handleSuccess } from '../utils';
-import bg from '../assets/bg.png'; // ✅ Import background image
+import { handleError, handleSuccess } from '../utils';// ✅ Import background image
 
 function Signup() {
     const [signupInfo, setSignupInfo] = useState({
@@ -56,7 +55,6 @@ function Signup() {
     return (
         <div
             className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
-            style={{ backgroundImage: `url(${bg})` }}
         >
             {/* Dark overlay to lighten bg */}
             <div className="absolute inset-0 bg-black/40"></div>
