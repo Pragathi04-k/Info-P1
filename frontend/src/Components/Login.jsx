@@ -32,14 +32,15 @@ function Login() {
       const result = await response.json();
       const { success, message, jwtToken, user, error } = result;
 
-      if (success) {
-        handleSuccess(message);
-        localStorage.setItem("token", jwtToken);
-        localStorage.setItem("loggedInUser", user.name);
-        localStorage.setItem("userEmail", user.email);
-        setTimeout(() => {
-          navigate("/agriculture-website");
-        }, 1000);
+     if (success) {
+  handleSuccess(message);
+  localStorage.setItem("token", jwtToken);
+  localStorage.setItem("loggedInUser", user.name);
+  localStorage.setItem("userEmail", user.email);
+  setTimeout(() => {
+    navigate("/dashboard");   // 👈 Redirect to DashboardPage.jsx
+  }, 1000);
+
       } else if (error) {
         const details = error?.details[0].message;
         handleError(details);
