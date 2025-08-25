@@ -68,7 +68,6 @@ function ProjectsPage() {
 
   return (
     <>
-      {/* Inline Styles */}
       <style>{`
         body {
           margin: 0;
@@ -77,7 +76,9 @@ function ProjectsPage() {
         }
         .layout {
           display: flex;
+          width: 100vw;
           height: 100vh;
+          overflow: hidden;
         }
         .sidebar {
           width: 220px;
@@ -88,7 +89,6 @@ function ProjectsPage() {
           flex-direction: column;
         }
         .sidebar h4 {
-          color: #fff;
           margin-bottom: 20px;
         }
         .sidebar button {
@@ -117,9 +117,15 @@ function ProjectsPage() {
           justify-content: space-between;
           align-items: center;
           border-bottom: 1px solid #ddd;
-          position: sticky;
-          top: 0;
-          z-index: 10;
+          position: relative;
+        }
+        .top-right {
+          position: absolute;
+          right: 20px;
+          top: 10px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
         }
         .profile-dropdown {
           position: relative;
@@ -134,6 +140,7 @@ function ProjectsPage() {
           box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
           padding: 5px 0;
           min-width: 160px;
+          z-index: 1000;
         }
         .dropdown-item {
           padding: 8px 15px;
@@ -168,7 +175,7 @@ function ProjectsPage() {
           <div className="top-navbar">
             <h5 className="mb-0">Projects</h5>
 
-            <div className="d-flex align-items-center gap-3">
+            <div className="top-right">
               <div className="user-info text-end">
                 <strong>{user.name}</strong>
                 <br />

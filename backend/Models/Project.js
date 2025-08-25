@@ -2,16 +2,27 @@ const mongoose = require('mongoose');
 
 const projectSchema = new mongoose.Schema(
   {
-    userId: {
+    userEmail: {
       type: String,
-      required: true
+      required: [true, 'User Email is required'],
+      trim: true,
     },
     repoLink: {
       type: String,
-      required: true
-    }
+      required: [true, 'Repository link is required'],
+      trim: true,
+      match: [
+        /^(https?:\/\/)?(www\.)?github\.com\/.+\/.+$/,
+        'Invalid GitHub repository link',
+      ],
+    },
+    status: {
+      type: String,
+      enum: ['Pending', 'Active', 'Completed'],
+      default: 'Pending',
+    },
   },
-  { timestamps: true } // adds createdAt and updatedAt
+  { timestamps: true }
 );
 
 module.exports = mongoose.model('Project', projectSchema);

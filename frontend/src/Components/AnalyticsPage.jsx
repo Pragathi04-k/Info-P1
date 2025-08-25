@@ -1,221 +1,347 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
-import '@fortawesome/fontawesome-free/css/all.min.css'
+// frontend/src/pages/AnalyticsPage.js
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from "chart.js";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-function AnalyticsPage() {
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [showProfileDropdown, setShowProfileDropdown] = useState(false)
-  const [user, setUser] = useState(null)
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-  useEffect(() => {
-    const loggedInUser = localStorage.getItem("loggedInUser")
-    const userEmail = localStorage.getItem("userEmail")
-    if (!loggedInUser || !userEmail) {
-      navigate("/login")
-    } else {
-      setUser({ name: loggedInUser, email: userEmail })
-    }
-  }, [navigate])
+const styles = {
+  layout: {
+    display: "grid",
+    gridTemplateColumns: "260px 1fr",
+    minHeight: "100vh",
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    background: "#eef2f7",
+    color: "#333",
+  },
+  sidebar: {
+    background: "linear-gradient(to bottom, #4a00e0, #8e2de2)",
+    color: "#fff",
+    display: "flex",
+    flexDirection: "column",
+    padding: "30px 20px",
+    boxShadow: "3px 0 15px rgba(0,0,0,0.1)",
+    position: "sticky",
+    top: 0,
+    height: "100vh",
+  },
+  sidebarHeader: {
+    fontSize: "1.8rem",
+    fontWeight: "bold",
+    marginBottom: "40px",
+    textAlign: "center",
+    letterSpacing: "1px",
+  },
+  sidebarNavItem: {
+    margin: "15px 0",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    padding: "12px 16px",
+    borderRadius: "10px",
+    fontWeight: 500,
+    transition: "all 0.3s",
+  },
+  mainContent: {
+    padding: "35px 50px",
+    overflowY: "auto",
+    width: "100%",
+  },
+  topNavbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "30px",
+  },
+  horizontalCardsContainer: {
+    display: "grid",
+    gridTemplateColumns: "1fr 1fr",
+    gap: "30px",
+    marginBottom: "30px",
+  },
+  horizontalCard: {
+    background: "#fff",
+    borderRadius: "16px",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+    padding: "20px",
+    transition: "all 0.3s",
+    minHeight: "180px",
+  },
+  projectsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: "30px",
+  },
+  projectCard: {
+    background: "#fff",
+    borderRadius: "16px",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
+    padding: "20px",
+    display: "flex",
+    flexDirection: "column",
+    textAlign: "left",
+    minHeight: "180px",
+  },
+  cardHeading: {
+    marginBottom: "12px",
+    fontWeight: "600",
+    fontSize: "1.1rem",
+  },
+  pieChart: {
+    maxWidth: "220px",
+    margin: "0 auto",
+  },
+  selectProject: {
+    maxWidth: "450px",
+    marginBottom: "25px",
+  },
+  emptyState: {
+    textAlign: "center",
+    padding: "40px",
+    color: "#555",
+  },
+  languageBadge: {
+    display: "inline-block",
+    padding: "6px 12px",
+    borderRadius: "12px",
+    margin: "5px 5px 0 0",
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: "0.9rem",
+  },
+};
 
-  const [analyticsData] = useState({
-    projectStats: { total: 6, active: 3, completed: 1, pending: 2 },
-    taskCompletion: { completed: 75, pending: 25 },
-    memberContributions: [
-      { name: 'Alice', tasks: 24, percentage: 30 },
-      { name: 'Bob', tasks: 18, percentage: 22.5 },
-      { name: 'Charlie', tasks: 15, percentage: 18.75 },
-      { name: 'Diana', tasks: 12, percentage: 15 },
-      { name: 'Others', tasks: 11, percentage: 13.75 }
-    ],
-    recentActivity: [
-      { action: 'Initial commit', project: 'AI Chatbot Integration', date: '2024-01-18' },
-      { action: 'Project created', project: 'Data Analytics Dashboard', date: '2024-01-21' },
-      { action: 'Task completed', project: 'E-commerce Platform', date: '2024-01-20' },
-      { action: 'Member added', project: 'Mobile Banking App', date: '2024-01-19' }
-    ]
-  })
+// Generate language color
+const getLanguageColor = (lang) => {
+  const colors = {
+    JavaScript: "#f1e05a",
+    Python: "#3572A5",
+    Java: "#b07219",
+    HTML: "#e34c26",
+    CSS: "#563d7c",
+    C: "#555555",
+    "C++": "#f34b7d",
+    TypeScript: "#2b7489",
+    default: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`,
+  };
+  return colors[lang] || colors.default;
+};
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 800)
-  }, [])
-
-  const handleNavigation = (path) => navigate(path)
-  const handleLogout = () => {
-    localStorage.clear()
-    navigate('/login')
+class AnalyticsErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
   }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, info) {
+    console.error("AnalyticsErrorBoundary caught an error:", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={styles.emptyState}>
+          <i className="fas fa-exclamation-triangle" style={{ fontSize: "2rem" }}></i>
+          <h3>Something went wrong</h3>
+          <p>{this.state.error?.message}</p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
-  if (!user) return null
+function AnalyticsPageContent() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectIndex, setSelectedProjectIndex] = useState(0);
+  const [projectAnalytics, setProjectAnalytics] = useState({
+    contributors: [],
+    commits: [],
+    languages: {},
+    collaborators: [],
+  });
+
+  const GITHUB_API_BASE = "https://api.github.com";
+  const GITHUB_TOKEN = import.meta.env.VITE_REACT_APP_GITHUB_TOKEN || "";
+  const headers = GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {};
+
+  // Fetch all projects
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/projects");
+        setProjects(res.data);
+      } catch (err) {
+        console.error("Failed to fetch projects:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProjects();
+  }, []);
+
+  // Fetch analytics
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (!projects.length) return;
+
+      const selectedProject = projects[selectedProjectIndex];
+      if (!selectedProject || !selectedProject.repoLink) return;
+
+      const repoLink = selectedProject.repoLink;
+      const [owner, repo] = repoLink.replace("https://github.com/", "").replace(/\/$/, "").split("/");
+
+      try {
+        const [contributorsRes, commitsRes, languagesRes, collaboratorsRes] = await Promise.all([
+          axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/contributors`, { headers }).catch(() => ({ data: [] })),
+          axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/commits?per_page=30`, { headers }).catch(() => ({ data: [] })),
+          axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/languages`, { headers }).catch(() => ({ data: {} })),
+          axios.get(`${GITHUB_API_BASE}/repos/${owner}/${repo}/collaborators`, { headers: { ...headers, Accept: "application/vnd.github+json" } }).catch(() => ({ data: [] })),
+        ]);
+
+        setProjectAnalytics({
+          contributors: contributorsRes.data || [],
+          commits: commitsRes.data || [],
+          languages: languagesRes.data || {},
+          collaborators: collaboratorsRes.data || [],
+        });
+      } catch (err) {
+        console.error("Failed to fetch analytics:", err.response?.data || err.message);
+        setProjectAnalytics({ contributors: [], commits: [], languages: {}, collaborators: [] });
+      }
+    };
+
+    fetchAnalytics();
+  }, [selectedProjectIndex, projects]);
+
+  if (loading) return <div style={styles.emptyState}><i className="fas fa-spinner fa-spin"></i> Loading analytics...</div>;
+
+  const commitChartData = {
+    labels: projectAnalytics.contributors.map(c => c.login),
+    datasets: [{
+      label: 'Commits',
+      data: projectAnalytics.contributors.map(c => c.contributions),
+      backgroundColor: projectAnalytics.contributors.map((_, idx) => `hsl(${(idx*60)%360},70%,50%)`),
+      borderWidth: 1
+    }]
+  };
 
   return (
-    <>
-      <style>{`
-        .brand-highlight { color: #00c2ff; }
-        .sidebar { width: 250px; min-height: 100vh; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); transition: all .3s ease; position: fixed; left: 0; top: 0; z-index: 1000; }
-        .sidebar.collapsed { width: 70px; }
-        .sidebar-header { padding: 1rem; border-bottom: 1px solid rgba(255,255,255,.1); }
-        .sidebar-nav { padding: 1rem 0; }
-        .sidebar-nav-item { display: flex; align-items: center; padding: .75rem 1rem; color: rgba(255,255,255,.8); text-decoration: none; transition: all .3s ease; border-left: 3px solid transparent; }
-        .sidebar-nav-item:hover, .sidebar-nav-item.active { color: #fff; background-color: rgba(255,255,255,.1); border-left-color: #00c2ff; text-decoration: none; }
-        .sidebar-nav-item i { width: 20px; margin-right: 10px; text-align: center; }
-        .sidebar.collapsed .sidebar-nav-item span { display: none; }
-        .main-content { margin-left: 250px; width: calc(100vw - 250px); min-height: 100vh; background-color: #f8f9fa; transition: all .3s ease; padding: 2rem; }
-        .main-content.expanded { margin-left: 70px; width: calc(100vw - 70px); }
-        .top-navbar { background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,.1); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .stats-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,.1); transition: all .3s ease; border: none; padding: 1.5rem; text-align: center; }
-        .stats-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,.15); }
-        .stats-number { font-size: 2.5rem; font-weight: bold; color: #00c2ff; }
-        .stats-label { color: #6c757d; font-weight: 500; text-transform: uppercase; font-size: .85rem; letter-spacing: .5px; }
-        .chart-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,.1); padding: 1.5rem; height: 100%; }
-        .progress-chart { width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(#00c2ff 0deg,#00c2ff 270deg,#e9ecef 270deg,#e9ecef 360deg); display: flex; align-items: center; justify-content: center; position: relative; margin: 0 auto 1rem; }
-        .progress-inner { width: 100px; height: 100px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .progress-percentage { font-size: 1.5rem; font-weight: bold; color: #00c2ff; }
-        .contribution-bar { background-color: #e9ecef; border-radius: 10px; height: 20px; margin-bottom: .5rem; overflow: hidden; }
-        .contribution-fill { background: linear-gradient(90deg,#00c2ff,#0099cc); height: 100%; border-radius: 10px; transition: width .8s ease; }
-        .profile-dropdown { position: relative; }
-        .dropdown-menu { position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #dee2e6; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,.1); min-width: 200px; z-index: 1001; }
-        .dropdown-item { display: flex; align-items: center; padding: .5rem 1rem; color: #495057; text-decoration: none; transition: background-color .3s ease; }
-        .dropdown-item:hover { background-color: #f8f9fa; color: #495057; text-decoration: none; }
-        .dropdown-item i { margin-right: .5rem; width: 16px; }
-        .loading-spinner { display: flex; justify-content: center; align-items: center; height: 300px; }
-        .activity-item { display: flex; align-items: center; padding: .75rem 0; border-bottom: 1px solid #e9ecef; }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon { width: 40px; height: 40px; border-radius: 50%; background: #00c2ff; display: flex; align-items: center; justify-content: center; color: #fff; margin-right: 1rem; }
-      `}</style>
-
+    <div style={styles.layout}>
       {/* Sidebar */}
-      <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
-        <div className="sidebar-header">
-          <h4 className="text-white mb-0"><span className="brand-highlight">Code</span>Collab</h4>
-        </div>
-        <nav className="sidebar-nav">
-          <a href="#" className="sidebar-nav-item" onClick={e => { e.preventDefault(); handleNavigation('/dashboard') }}>
-            <i className="bi bi-speedometer2"></i><span>Dashboard</span>
-          </a>
-          <a href="#" className="sidebar-nav-item" onClick={e => { e.preventDefault(); handleNavigation('/projects') }}>
-            <i className="bi bi-folder"></i><span>Projects</span>
-          </a>
-          <a href="#" className="sidebar-nav-item active" onClick={e => { e.preventDefault(); handleNavigation('/analytics') }}>
-            <i className="bi bi-graph-up"></i><span>Analytics</span>
-          </a>
-        </nav>
+      <div style={styles.sidebar}>
+        <div style={styles.sidebarHeader}>CodeCollab</div>
+        {["Dashboard","Projects","Analytics","Profile","Settings"].map((item, idx) => (
+          <div
+            key={idx}
+            style={styles.sidebarNavItem}
+            onClick={() => navigate(`/${item.toLowerCase()}`)}
+          >
+            <i className={`bi bi-${["speedometer2","folder","graph-up","person","gear"][idx]}`}></i> {item}
+          </div>
+        ))}
       </div>
 
       {/* Main Content */}
-      <div className={`main-content ${sidebarCollapsed ? 'expanded' : ''}`}>
-        {/* Top Navbar */}
-        <div className="top-navbar">
-          <div className="d-flex align-items-center">
-            <button className="btn btn-link text-dark p-0 me-3" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
-              <i className="bi bi-list fs-4"></i>
-            </button>
-            <h5 className="mb-0">Analytics & Insights</h5>
+      <div style={styles.mainContent}>
+        <div style={styles.topNavbar}>
+          <h3>Project Analytics</h3>
+        </div>
+
+        {/* Project Selector */}
+        {projects.length > 0 && (
+          <div className="mb-4" style={styles.selectProject}>
+            <select
+              className="form-select"
+              value={selectedProjectIndex}
+              onChange={(e) => setSelectedProjectIndex(Number(e.target.value))}
+            >
+              {projects.map((p, idx) => (
+                <option key={idx} value={idx}>{p.repoLink}</option>
+              ))}
+            </select>
           </div>
-          <div className="d-flex align-items-center">
-            {/* Logged-in user at top-right */}
-            <div className="profile-dropdown">
-              <button className="btn btn-link text-dark p-0 d-flex align-items-center" onClick={() => setShowProfileDropdown(!showProfileDropdown)}>
-                <div className="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white me-2" style={{ width: '32px', height: '32px' }}>
-                  <i className="bi bi-person"></i>
-                </div>
-                <span className="fw-bold">{user.name}</span>
-                <i className="bi bi-chevron-down ms-1"></i>
-              </button>
-              {showProfileDropdown && (
-                <div className="dropdown-menu show">
-                  <a href="#" className="dropdown-item text-danger" onClick={e => { e.preventDefault(); setShowProfileDropdown(false); handleLogout() }}>
-                    <i className="bi bi-box-arrow-right"></i> Logout
-                  </a>
-                </div>
-              )}
-            </div>
+        )}
+
+        {/* Contributors + Commits */}
+        <div style={styles.horizontalCardsContainer}>
+          <div style={styles.horizontalCard}>
+            <h5 style={styles.cardHeading}>Contributors</h5>
+            {projectAnalytics.contributors.length ? (
+              <ul>
+                {projectAnalytics.contributors.map(c => (
+                  <li key={c.id}>{c.login} ({c.contributions} commits)</li>
+                ))}
+              </ul>
+            ) : <p>No contributors found.</p>}
+          </div>
+
+          <div style={styles.horizontalCard}>
+            <h5 style={styles.cardHeading}>Recent Commits</h5>
+            {projectAnalytics.commits.length ? (
+              <ul>
+                {projectAnalytics.commits.slice(0, 5).map(c => (
+                  <li key={c.sha}>
+                    <strong>{c.commit?.author?.name || "Unknown"}</strong>: {c.commit?.message || "No message"}
+                  </li>
+                ))}
+              </ul>
+            ) : <p>No recent commits found.</p>}
           </div>
         </div>
 
-        {/* Page Content */}
-        {loading ? (
-          <div className="loading-spinner">
-            <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading analytics...</span>
-            </div>
+        {/* Grid */}
+        <div style={styles.projectsGrid}>
+          <div style={{...styles.projectCard, textAlign:"center"}}>
+            <h5 style={styles.cardHeading}>Commits Distribution</h5>
+            {projectAnalytics.contributors.length ? <div style={styles.pieChart}><Pie data={commitChartData} /></div> : <p>No commits found.</p>}
           </div>
-        ) : (
-          <>
-            {/* Project Statistics */}
-            <div className="mb-5 d-flex" style={{ gap: '1rem' }}>
-              {Object.entries(analyticsData.projectStats).map(([key, value], idx) => (
-                <div key={idx} className="stats-card" style={{ flex: 1 }}>
-                  <div className={`stats-number ${key === 'active' ? 'text-success' : key === 'completed' ? 'text-primary' : key === 'pending' ? 'text-warning' : ''}`}>{value}</div>
-                  <div className="stats-label">{key.charAt(0).toUpperCase() + key.slice(1)}</div>
-                </div>
-              ))}
-            </div>
 
-            {/* Charts + Recent Activity */}
-            <div className="d-flex" style={{ gap: '1rem' }}>
-              {/* Charts */}
-              <div style={{ flex: 2 }}>
-                <h4 className="fw-bold mb-4">Performance Charts</h4>
-                <div className="d-flex" style={{ gap: '1rem' }}>
-                  {/* Task Completion */}
-                  <div style={{ flex: 1 }}>
-                    <div className="chart-card">
-                      <h5 className="fw-bold mb-4">Task Completion</h5>
-                      <div className="progress-chart">
-                        <div className="progress-inner">
-                          <div className="progress-percentage">{analyticsData.taskCompletion.completed}%</div>
-                          <small className="text-muted">Completed</small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Member Contributions */}
-                  <div style={{ flex: 1 }}>
-                    <div className="chart-card">
-                      <h5 className="fw-bold mb-4">Member Contributions</h5>
-                      {analyticsData.memberContributions.map((m, idx) => (
-                        <div key={idx} className="mb-3">
-                          <div className="d-flex justify-content-between mb-1">
-                            <small className="fw-bold">{m.name}</small>
-                            <small className="text-muted">{m.tasks} tasks</small>
-                          </div>
-                          <div className="contribution-bar">
-                            <div className="contribution-fill" style={{ width: `${m.percentage}%` }}></div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+          <div style={styles.projectCard}>
+            <h5 style={styles.cardHeading}>Languages</h5>
+            {Object.keys(projectAnalytics.languages).length ? (
+              <div>
+                {Object.entries(projectAnalytics.languages).map(([lang, lines]) => (
+                  <span key={lang} style={{...styles.languageBadge, backgroundColor: getLanguageColor(lang)}}>
+                    {lang}: {lines} lines
+                  </span>
+                ))}
               </div>
+            ) : <p>No languages found.</p>}
+          </div>
 
-              {/* Recent Activity */}
-              <div style={{ flex: 1 }}>
-                <h4 className="fw-bold mb-4">Recent Activity</h4>
-                <div className="card p-3" style={{ height: '100%' }}>
-                  {analyticsData.recentActivity.map((a, i) => (
-                    <div key={i} className="activity-item">
-                      <div className="activity-icon">
-                        <i className="bi bi-clock-history"></i>
-                      </div>
-                      <div>
-                        <div><strong>{a.action}</strong> – {a.project}</div>
-                        <small className="text-muted">{a.date}</small>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
+          <div style={styles.projectCard}>
+            <h5 style={styles.cardHeading}>Collaborators</h5>
+            {projectAnalytics.collaborators.length ? (
+              <ul>
+                {projectAnalytics.collaborators.map(col => <li key={col.id}>{col.login}</li>)}
+              </ul>
+            ) : <p>No collaborators found.</p>}
+          </div>
+        </div>
       </div>
-    </>
-  )
+    </div>
+  );
 }
 
-export default AnalyticsPage
+export default function AnalyticsPage() {
+  return (
+    <AnalyticsErrorBoundary>
+      <AnalyticsPageContent />
+    </AnalyticsErrorBoundary>
+  );
+}

@@ -11,6 +11,7 @@ function ProfilePage() {
   const [showEditModal, setShowEditModal] = useState(false)
 
   const [user, setUser] = useState(null)
+  const [profileImage, setProfileImage] = useState(null) // <-- avatar image
   const [userStats, setUserStats] = useState({
     projectsCount: 0,
     tasksCompleted: 0,
@@ -79,10 +80,22 @@ function ProfilePage() {
     }
   }
 
+  // Handle image upload
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfileImage(reader.result) // save Base64 image for preview
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   if (!user) return null
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div style={{ display: 'flex', width: '100vw', height: '100vh', backgroundColor: '#f8f9fa' }}>
       {/* Sidebar */}
       <div style={{
         width: sidebarCollapsed ? '70px' : '220px',
@@ -166,7 +179,7 @@ function ProfilePage() {
         </div>
 
         {/* Profile Section */}
-        <div style={{ padding: '30px', flexGrow: 1 }}>
+        <div style={{ padding: '30px', flexGrow: 1, overflowY: 'auto' }}>
           <div className="row g-4">
             {/* Profile Card */}
             <div className="col-lg-4">
@@ -178,17 +191,23 @@ function ProfilePage() {
                 textAlign: 'center'
               }}>
                 <div style={{
-                  width: '80px', height: '80px',
+                  width: '100px', height: '100px',
                   borderRadius: '50%',
                   backgroundColor: '#e9ecef',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
                   margin: '0 auto 15px',
-                  fontSize: '32px'
+                  fontSize: '32px',
+                  overflow: 'hidden'
                 }}>
-                  <i className="bi bi-person"></i>
+                  {profileImage ? (
+                    <img src={profileImage} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <i className="bi bi-person"></i>
+                  )}
                 </div>
+                <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-3" />
                 <h3 className="fw-bold">{user.name}</h3>
                 <span className={`badge ${getRoleBadgeClass(user.role)} mb-2`}>
                   {user.role.toUpperCase()}

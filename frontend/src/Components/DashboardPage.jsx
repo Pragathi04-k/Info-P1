@@ -73,6 +73,18 @@ function DashboardPage() {
     }
   };
 
+  // ✅ Delete Project
+  const handleDeleteProject = async (projectId) => {
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    try {
+      await axios.delete(`${API_BASE}/projects/${projectId}`);
+      setProjects((prev) => prev.filter((p) => p._id !== projectId));
+    } catch (err) {
+      console.error("Error deleting project:", err);
+      alert("Failed to delete project");
+    }
+  };
+
   // ✅ Logout
   const handleLogout = () => {
     localStorage.clear();
@@ -246,12 +258,20 @@ function DashboardPage() {
                       {p.status || "Pending"}
                     </span>
                   </div>
-                  <button
-                    className="btn btn-primary btn-sm"
-                    onClick={() => handleProjectClick(p)}
-                  >
-                    Open Project
-                  </button>
+                  <div className="d-flex gap-2">
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => handleProjectClick(p)}
+                    >
+                      Open Project
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeleteProject(p._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

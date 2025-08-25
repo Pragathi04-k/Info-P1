@@ -5,8 +5,9 @@
   "type": "commonjs",
   "scripts": {
   "start": "node index.js",
-  "build-frontend": "cd ../frontend && npm install && npm run build"
+  "dev": "nodemon index.js"
 }
+
 ,
   "dependencies": {
     "@hapi/joi": "^17.1.1",
