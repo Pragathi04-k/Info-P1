@@ -1,5 +1,5 @@
 // src/pages/DashboardPage.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -17,9 +17,14 @@ function DashboardPage() {
   const [newRepoLink, setNewRepoLink] = useState("");
   const [user, setUser] = useState(null);
 
+  // ✅ Whiteboard state
+  const [penColor, setPenColor] = useState("#000000");
+  const [penSize, setPenSize] = useState(2);
+  const canvasRef = useRef(null);
+
   const API_BASE = "http://localhost:8080";
 
-  // ✅ Auth Guard + Load user from localStorage
+  // ✅ Auth Guard + Load user
   useEffect(() => {
     const token = localStorage.getItem("token");
     const name = localStorage.getItem("loggedInUser");
@@ -112,7 +117,7 @@ function DashboardPage() {
     try {
       const res = await axios.post(`${API_BASE}/projects`, {
         repoLink: newRepoLink,
-        userEmail: user?.email, // associate by email
+        userEmail: user?.email,
       });
       setProjects([res.data, ...projects]);
       setNewRepoLink("");
@@ -121,6 +126,51 @@ function DashboardPage() {
       console.error("Error adding project:", err);
       alert("Failed to add project");
     }
+  };
+
+  // ✅ Whiteboard Drawing Logic
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let drawing = false;
+
+    const startDrawing = (e) => {
+      drawing = true;
+      draw(e);
+    };
+    const endDrawing = () => {
+      drawing = false;
+      ctx.beginPath();
+    };
+    const draw = (e) => {
+      if (!drawing) return;
+      ctx.lineWidth = penSize;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = penColor;
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    };
+
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mouseup", endDrawing);
+    canvas.addEventListener("mousemove", draw);
+
+    return () => {
+      canvas.removeEventListener("mousedown", startDrawing);
+      canvas.removeEventListener("mouseup", endDrawing);
+      canvas.removeEventListener("mousemove", draw);
+    };
+  }, [penColor, penSize]);
+
+  // ✅ Clear Whiteboard
+  const clearWhiteboard = () => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
   return (
@@ -159,7 +209,7 @@ function DashboardPage() {
         <div className="sidebar">
           <div className="sidebar-header">CodeCollab</div>
           <nav className="sidebar-nav">
-            {["Dashboard", "Projects", "Analytics", "Profile", "Settings"].map(
+            {["Dashboard", "Projects", "Analytics", "Profile","CollabRoom", "Settings"].map(
               (item, i) => (
                 <a
                   href="#"
@@ -172,7 +222,7 @@ function DashboardPage() {
                 >
                   <i
                     className={`bi bi-${
-                      ["speedometer2", "folder", "graph-up", "person", "gear"][i]
+                      ["speedometer2", "folder", "graph-up", "person", "people", "gear"][i]
                     }`}
                   ></i>
                   {item}
@@ -335,10 +385,56 @@ function DashboardPage() {
             </div>
           )}
 
-                 </div> {/* close .main-content */}
-      </div> {/* close .layout */}
+          {/* ✅ Whiteboard Section with Controls */}
+          <div className="whiteboard-container mt-5 w-100 text-center">
+            <h4 className="mb-3">Whiteboard</h4>
 
-      {/* ✅ Chatbot Floating Widget (bottom-right corner of laptop screen) */}
+            {/* Controls */}
+            <div className="mb-3 d-flex justify-content-center gap-3">
+              <label>
+                Pen Color:
+                <input
+                  type="color"
+                  value={penColor}
+                  onChange={(e) => setPenColor(e.target.value)}
+                  className="ms-2"
+                />
+              </label>
+              <label>
+                Pen Size:
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={penSize}
+                  onChange={(e) => setPenSize(parseInt(e.target.value))}
+                  className="ms-2"
+                  style={{ width: "60px" }}
+                />
+              </label>
+              <button className="btn btn-danger btn-sm" onClick={clearWhiteboard}>
+                Clear Whiteboard
+              </button>
+            </div>
+
+            <canvas
+              ref={canvasRef}
+              id="whiteboard"
+              width="900"
+              height="500"
+              style={{
+                border: "2px solid #ccc",
+                borderRadius: "8px",
+                background: "#fff",
+                cursor: "crosshair",
+                maxWidth: "100%",
+              }}
+            ></canvas>
+          </div>
+        </div>
+      </div>
+
+      {/* ✅ Chatbot Floating Widget */}
       <div
         style={{
           position: "fixed",
@@ -348,7 +444,7 @@ function DashboardPage() {
           flexDirection: "column",
           alignItems: "center",
           cursor: "pointer",
-          zIndex: 2000, // ensure above all UI
+          zIndex: 2000,
         }}
       >
         <div
@@ -384,5 +480,4 @@ function DashboardPage() {
     </>
   );
 }
-
 export default DashboardPage;

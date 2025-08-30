@@ -8,6 +8,7 @@ import ProjectsPage from './Components/ProjectsPage'
 import AnalyticsPage from './Components/AnalyticsPage'
 import ProfilePage from './Components/ProfilePage'
 import SettingPage from './Components/SettingPage'
+import CollabRoom from './Components/CollabRoom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 // Import Bootstrap JS
@@ -25,6 +26,7 @@ function App() {
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/setting" element={<SettingPage />} />
+        <Route path="/collabroom" element={<CollabRoom/>}/>
       </Routes>
     </Router>
   )
