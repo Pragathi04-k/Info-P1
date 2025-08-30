@@ -468,27 +468,7 @@ function LandingPage() {
 
         {/* Chatbot Icon + Text */}
 
-        <div style={chatbotWrapperStyle}>
-
-          <div
-
-            style={chatbotIconStyle}
-
-            onClick={() => window.open("https://codecollab-chat-1.onrender.com/", "_blank")}
-
-            onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.1)"}
-
-            onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
-
-          >
-
-            <i className="fas fa-robot"></i>
-
-          </div>
-
-          <p style={chatbotTextStyle}>Click me, I will help you</p>
-
-        </div>
+       
 
       </section>
 

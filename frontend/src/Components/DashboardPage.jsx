@@ -334,7 +334,52 @@ function DashboardPage() {
               </div>
             </div>
           )}
+
+                 </div> {/* close .main-content */}
+      </div> {/* close .layout */}
+
+      {/* ✅ Chatbot Floating Widget (bottom-right corner of laptop screen) */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          cursor: "pointer",
+          zIndex: 2000, // ensure above all UI
+        }}
+      >
+        <div
+          style={{
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            backgroundColor: "#007bff",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "#fff",
+            fontSize: "24px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            transition: "transform 0.2s",
+          }}
+          onClick={() =>
+            window.open("https://codecollab-chat-1.onrender.com/", "_blank")
+          }
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.transform = "scale(1.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.transform = "scale(1)")
+          }
+        >
+          <i className="fas fa-robot"></i>
         </div>
+        <p style={{ marginTop: "8px", fontSize: "12px", color: "#333" }}>
+          Click me, I will help you
+        </p>
       </div>
     </>
   );
