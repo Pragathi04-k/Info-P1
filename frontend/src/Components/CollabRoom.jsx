@@ -11,8 +11,9 @@ function CollabRoom() {
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const peerConnection = useRef(null);
+  const localStream = useRef(null);
 
-  // ✅ Start Video + Audio
+  // ✅ Start Call after pressing Join
   const startCall = async () => {
     try {
       peerConnection.current = new RTCPeerConnection();
@@ -21,6 +22,8 @@ function CollabRoom() {
         video: true,
         audio: true,
       });
+
+      localStream.current = stream;
 
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
@@ -43,6 +46,24 @@ function CollabRoom() {
     }
   };
 
+  // ✅ End Call
+  const endCall = () => {
+    if (localStream.current) {
+      localStream.current.getTracks().forEach((track) => track.stop());
+      localStream.current = null;
+    }
+    if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
+
+    if (peerConnection.current) {
+      peerConnection.current.close();
+      peerConnection.current = null;
+    }
+
+    setInCall(false);
+    setJoinLink("");
+  };
+
   // ✅ Handle Chat Send
   const sendMessage = () => {
     if (!newMsg.trim()) return;
@@ -59,17 +80,16 @@ function CollabRoom() {
     }
   };
 
-  // ✅ Create Room Link
+  // ✅ Create Room Link (just generates, no camera yet)
   const handleCreateLink = () => {
     const link = `${window.location.origin}/collabroom/${Math.random()
       .toString(36)
       .substring(2, 8)}`;
     setRoomLink(link);
-    startCall();
     alert(`Room created! Share this link: ${link}`);
   };
 
-  // ✅ Join Room
+  // ✅ Join Room (only then camera starts)
   const handleJoinLink = () => {
     if (!joinLink.trim()) {
       alert("Please enter a valid room link");
@@ -77,7 +97,7 @@ function CollabRoom() {
     }
     startCall();
     alert(`Joining room: ${joinLink}`);
-    // 👉 Future: Connect to signaling server here
+    // 👉 Future: signaling goes here
   };
 
   return (
@@ -97,8 +117,7 @@ function CollabRoom() {
       {/* ✅ Video Call Section */}
       <div
         style={{
-          background: "#000", // dark background like Meet
-          padding: "0",
+          background: "#000",
           borderRadius: "12px",
           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
           display: "flex",
@@ -111,7 +130,7 @@ function CollabRoom() {
 
         {inCall ? (
           <div style={{ flex: 1, position: "relative" }}>
-            {/* Remote video fills the section */}
+            {/* Remote video fills */}
             <video
               ref={remoteVideoRef}
               autoPlay
@@ -121,10 +140,10 @@ function CollabRoom() {
                 height: "100%",
                 objectFit: "cover",
                 borderRadius: "12px",
+                background: "#000",
               }}
             />
-
-            {/* Local preview like Meet (small, bottom-right) */}
+            {/* Local preview */}
             <video
               ref={localVideoRef}
               autoPlay
@@ -145,7 +164,7 @@ function CollabRoom() {
           </div>
         ) : (
           <p style={{ color: "#aaa", margin: "auto" }}>
-            🎥 Start or join a room to enable camera & mic
+            🎥 Create or join a room to enable camera & mic
           </p>
         )}
 
@@ -159,24 +178,36 @@ function CollabRoom() {
             background: "#111",
           }}
         >
-          <button className="btn btn-success" onClick={handleCreateLink}>
-            <i className="bi bi-link-45deg me-1"></i> Create Link
-          </button>
+          {!inCall ? (
+            <>
+              <button className="btn btn-success" onClick={handleCreateLink}>
+                <i className="bi bi-link-45deg me-1"></i> Create Link
+              </button>
 
-          <input
-            type="text"
-            placeholder="Enter room link..."
-            className="form-control"
-            value={joinLink}
-            onChange={(e) => setJoinLink(e.target.value)}
-            style={{ maxWidth: "300px", flex: "1" }}
-          />
-          <button className="btn btn-primary" onClick={handleJoinLink}>
-            Join
-          </button>
+              <input
+                type="text"
+                placeholder="Enter room link..."
+                className="form-control"
+                value={joinLink}
+                onChange={(e) => setJoinLink(e.target.value)}
+                style={{ maxWidth: "300px", flex: "1" }}
+              />
+              <button className="btn btn-primary" onClick={handleJoinLink}>
+                Join Call
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={endCall}
+              className="btn btn-danger"
+              style={{ flex: 1 }}
+            >
+              End Call
+            </button>
+          )}
         </div>
 
-        {roomLink && (
+        {roomLink && !inCall && (
           <p
             style={{
               marginTop: "10px",
@@ -191,7 +222,7 @@ function CollabRoom() {
         )}
       </div>
 
-      {/* ✅ Chat + Image Sharing (unchanged) */}
+      {/* ✅ Chat Section */}
       <div
         style={{
           background: "#fff",
@@ -273,7 +304,7 @@ function CollabRoom() {
         </div>
       </div>
 
-      {/* ✅ Responsive Fix for Mobile */}
+      {/* ✅ Responsive Fix */}
       <style>
         {`
           @media (max-width: 992px) {

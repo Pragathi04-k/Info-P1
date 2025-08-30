@@ -177,31 +177,201 @@ function DashboardPage() {
     <>
       {/* Inline CSS */}
       <style>{`
-        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
-        .layout { display: flex; height: 100vh; width: 100%; }
-        .sidebar {
-          width: 180px;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: #fff; flex-shrink: 0; display: flex; flex-direction: column;
-        }
-        .sidebar-header { padding: 1.2rem; font-size: 1.2rem; font-weight: bold; text-align: center; }
-        .sidebar-nav { margin-top: 1rem; flex-grow: 1; }
-        .sidebar-nav-item { display: flex; align-items: center; gap: .5rem; padding: .7rem .9rem; color: #fff; text-decoration: none; border-radius: 8px; transition: all .3s; }
-        .sidebar-nav-item:hover { background: rgba(255,255,255,0.15); }
-        .main-content {
-          flex: 1; padding: 2rem; background: #f8f9fa;
-          display: flex; flex-direction: column; align-items: center;
-          overflow-y: auto;
-        }
-        .main-content > * { max-width: 1400px; width: 100%; }
-        .top-navbar { display: flex; justify-content: space-between; align-items: center; padding: .75rem 1rem; background: #fff; border-bottom: 1px solid #dee2e6; margin-bottom: 1.5rem; border-radius: 8px; }
-        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 1.5rem; width: 100%; }
-        .project-card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); background: #fff; padding: 1rem; transition: transform .2s, box-shadow .2s; }
-        .project-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-        .project-status { font-size: .7rem; font-weight: 600; padding: .25rem .6rem; border-radius: 12px; }
-        .empty-state { text-align: center; padding: 3rem 1rem; color: #6c757d; }
-        .empty-state-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.5; }
-        .dropdown-menu.show { display: block; position: absolute; right: 0; margin-top: 10px; }
+        html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Layout */
+.layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background: linear-gradient(180deg, #4e54c8, #8f94fb);
+  color: #fff;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.sidebar-nav {
+  margin-top: 1rem;
+  flex-grow: 1;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: .9rem 1rem;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: all .3s ease;
+  font-weight: 500;
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(6px);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background: linear-gradient(to right, #f9f9f9, #f0f4ff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.main-content > * {
+  max-width: 1400px;
+  width: 100%;
+}
+
+/* Navbar */
+.top-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .9rem 1.2rem;
+  background: #fff;
+  border-bottom: 1px solid #eaeaea;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Project Section */
+/* Project Section */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* wider box */
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.project-card {
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background: #fff;
+  padding: 1.3rem;
+  transition: transform .25s, box-shadow .25s;
+  border-left: 6px solid #4e54c8;
+  overflow: hidden; /* keep content inside */
+  word-wrap: break-word; /* break long text */
+  min-height: 120px;
+}
+
+.project-card h6 {
+  max-width: 70%;              /* don’t let it overflow */
+  white-space: nowrap;         /* keep in one line */
+  overflow: hidden;            /* hide extra text */
+  text-overflow: ellipsis;     /* show ... at end */
+}
+
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+}
+
+.project-status {
+  font-size: .75rem;
+  font-weight: 600;
+  padding: .3rem .7rem;
+  border-radius: 14px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.empty-state-icon {
+  font-size: 3.8rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Dropdown */
+.dropdown-menu.show {
+  display: block;
+  position: absolute;
+  right: 0;
+  margin-top: 10px;
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+}
+
+/* Whiteboard */
+.whiteboard-container {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.whiteboard-container h4 {
+  font-weight: 600;
+  color: #333;
+}
+
+#whiteboard {
+  border: 2px dashed #cfcfcf;
+  border-radius: 12px;
+  background: #fff;
+  cursor: crosshair;
+  margin-top: 1rem;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 8px !important;
+  font-weight: 500;
+  transition: all .2s ease-in-out;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Chatbot */
+.fas.fa-robot {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
       `}</style>
 
       <div className="layout">
