@@ -7,8 +7,6 @@ export default defineConfig({
   preview: {
     port: process.env.PORT || 8080,
     host: true,
-    allowedHosts: [
-      'info-p1-4.onrender.com'  // ✅ add your Render domain here
-    ]
+    allowedHosts: ['.onrender.com']
   }
 })
