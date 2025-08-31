@@ -146,7 +146,7 @@ function LandingPage() {
 
     right: '5%',
 
-    top: 'calc(20% + 320px)', // just below the image
+    top: 'calc(20% + 320px)', 
 
     display: 'flex',
 
